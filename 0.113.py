@@ -17,7 +17,7 @@ def start(message):
     item1 = types.KeyboardButton("Сложный процент")
     item2 = types.KeyboardButton("Цена финансового инструмена")
     item3 = types.KeyboardButton("Погода в любом городе")
-    item4 = types.KeyboardButton("Время в любом городе")
+    item4 = types.KeyboardButton("Количество заболевших короновирусом")
     murckup.add(item1, item2, item3, item4)
     bot.send_message(message.chat.id, "Выберете предложеныые функции",  reply_markup= murckup)
 @bot.message_handler(content_types=["text"])
@@ -31,10 +31,10 @@ def handle_text(message):
             Tick = bot.send_message(message.from_user.id, 'Введите тикер: ')
             bot.register_next_step_handler(Tick, tick_)
         elif message.text == "Погода в любом городе":
-            Wether = bot.send_message(message.from_user.id, 'Введите город: ')
+            Wether = bot.send_message(message.from_user.id, 'Введите город на английском с пропесной боквы: ')
             bot.register_next_step_handler(Wether, wether_)
-        elif message.text == "Время в любом городе":
-            Time = bot.send_message(message.from_user.id, 'Введите город: ')
+        elif message.text == "Количество заболевших короновирусом":
+            Time = bot.send_message(message.from_user.id, 'Введите страну(на анлгийском с заглавной буквы): ')
             bot.register_next_step_handler(Time, time_)
 def rate(message):
     global r
@@ -94,7 +94,7 @@ def wether_(message):
         bot.send_message(message.from_user.id, "Неверный город, выберет функцию")
 
 def time_(message):
-    #try:
+    try:
         contry = str(message.text)
         conn = http.client.HTTPSConnection("api.collectapi.com")
 
@@ -111,8 +111,11 @@ def time_(message):
         a = data.decode("utf-8")
         print(data)
         b = json.loads(a)
-        c = b["result"][0][f"{contry}"]
-        bot.send_message(message.from_user.id, c)
-    #except:
-        bot.send_message(message.from_user.id, "Неверный город, выберет функцию")
+        c = b["result"]
+        for i in c:
+            if i["country"] == contry:
+                k = i["totalCases"]
+        bot.send_message(message.from_user.id, k)
+    except:
+        bot.send_message(message.from_user.id, "Неверный страна, выберет функцию")
 bot.infinity_polling()
